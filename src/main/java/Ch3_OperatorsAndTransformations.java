@@ -6,12 +6,14 @@ import java.util.Date;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+import static rx.Observable.interval;
+
 /**
  * @author Mike Dunbar
  */
 public class Ch3_OperatorsAndTransformations {
 
-    public static final List<String> STRING_LIST = Arrays.asList("hello", "goodbye", "tuna", "ham");
+    public static final List<String> STRING_LIST = Arrays.asList("hello", "goodbye", "tuna", "ham", "jelly", "trump", "funk");
 
     public static void main(String[] args) {
         //doSimpleFilteringAndMapping();
@@ -22,7 +24,67 @@ public class Ch3_OperatorsAndTransformations {
         //doTimerWithFlatMap();
         //doDelayOperatorVariedByInput();
         //rewriteDelayWithFlatMapAndTimer();
-        showConcatMatPreservingOrderOfSourceStreamEvents();
+        //showConcatMatPreservingOrderOfSourceStreamEvents();
+        //showHowToLimitConcurrencyWithFlatMap();
+        //mergeThreeObservableStreams();
+        //TODO mergeWithDelayError();//p.79
+        //TODO zipThreeStreams();
+        //TODO zipTwoStreamsProducingEventsAtDifferentFrequency
+        combineLatestShowingDrop();
+        //TODO latestFrom
+
+
+
+    }
+
+    private static void combineLatestShowingDrop() {
+        Observable.combineLatest(
+                interval(17, TimeUnit.MILLISECONDS).map(x -> "S" + x).startWith("SX"),
+                interval(5, TimeUnit.MILLISECONDS).map(x -> "F" + x),
+                (s, f) -> f + ":" + s
+        ).forEach(System.out::println);
+
+        sleep(5000);
+    }
+
+//    private static void zipThreeStreams() {
+//        Observable<String> obs1 = Observable.just("hi", "bye");
+//        Observable<String> obs2 = Observable.just("blue", "green");
+//        obs1.zipWith(obs2,
+//                (a, b) -> {System.out.println("Zipped: " + a + ", " + b);});
+//    }
+
+    private static void mergeThreeObservableStreams() {
+        Observable<String> obs1 = Observable.just("hi", "bye");
+        Observable<String> obs2 = Observable.just("blue", "green");
+        Observable<String> obs3 = Observable.just("night", "day");
+
+        Observable<String> all = Observable.merge(obs1,obs2, obs3);
+        all.subscribe(System.out::println);
+
+        Observable<String> both = obs1.mergeWith(obs3);
+        both.subscribe(System.out::println);
+    }
+
+    private static void doSomeFlatMapping() {
+        Observable
+                .from(STRING_LIST)
+                .doOnNext(s -> System.out.println("From Source Stream: " + s))
+                .flatMap(s -> charsFromString(s))
+                .subscribe(s -> System.out.println("From final Stream: " + s));
+    }
+
+    private static void showHowToLimitConcurrencyWithFlatMap() {
+        Observable
+                .from(STRING_LIST)
+                .doOnNext(s -> System.out.println(new Date() + ": From Source Stream: " + s))
+                .flatMap(s ->
+                        interval(1, TimeUnit.SECONDS)
+                        .take(2)
+                        .map(i -> s.charAt(i.intValue())), 2      )
+                .subscribe(s -> System.out.println(new Date() + ": From final Stream: " + s));
+        sleep(10000);
+
     }
 
     private static void showConcatMatPreservingOrderOfSourceStreamEvents() {
@@ -31,13 +93,7 @@ public class Ch3_OperatorsAndTransformations {
                 .concatMap(x ->
                         Observable.timer(x.length(), TimeUnit.SECONDS).map(n -> x))
                 .subscribe(s -> System.out.println(new Date() + ": " + s));
-        try {
-            System.out.println(new Date() + ": Going to sleep");
-            Thread.sleep(30000);
-            System.out.println(new Date() + ": Done sleeping");
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+        sleep(30000);
     }
 
     private static void rewriteDelayWithFlatMapAndTimer() {
@@ -46,13 +102,7 @@ public class Ch3_OperatorsAndTransformations {
                 .flatMap(x ->
                     Observable.timer(x.length(), TimeUnit.SECONDS).map(n -> x))
                 .subscribe(s -> System.out.println(new Date() + ": " + s));
-        try {
-            System.out.println(new Date() + ": Going to sleep");
-            Thread.sleep(10000);
-            System.out.println(new Date() + ": Done sleeping");
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+        sleep(10000);
     }
 
     private static void doDelayOperatorVariedByInput() {
@@ -60,13 +110,7 @@ public class Ch3_OperatorsAndTransformations {
                 .from(STRING_LIST)
                 .delay(s -> Observable.just(s).timer(s.length(), TimeUnit.SECONDS))
                 .subscribe(s -> System.out.println(new Date() + ": " + s));
-        try {
-            System.out.println(new Date() + ": Going to sleep");
-            Thread.sleep(10000);
-            System.out.println(new Date() + ": Done sleeping");
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+        sleep(10000);
     }
 
     private static void doTimerWithFlatMap() {
@@ -74,13 +118,7 @@ public class Ch3_OperatorsAndTransformations {
                 .timer(1, TimeUnit.SECONDS)
                 .flatMap(i -> Observable.just("a", "b", "c", "d"))
                 .subscribe(i -> System.out.println(new Date() + ": " + i));
-        try {
-            System.out.println(new Date() + ": Going to sleep");
-            Thread.sleep(2000);
-            System.out.println(new Date() + ": Done sleeping");
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+        sleep(2000);
     }
 
     private static void doDelayOperator() {
@@ -88,13 +126,7 @@ public class Ch3_OperatorsAndTransformations {
                 .just("a", "b", "c", "d")
                 .delay(1, TimeUnit.SECONDS)
                 .subscribe(s -> System.out.println(new Date() + ": " + s));
-        try {
-            System.out.println(new Date() + ": Going to sleep");
-            Thread.sleep(2000);
-            System.out.println(new Date() + ": Done sleeping");
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+        sleep(2000);
     }
 
     private static void doSomeFlatMapReactingToCompletionAndErrorAsWell() {
@@ -114,15 +146,8 @@ public class Ch3_OperatorsAndTransformations {
 
     }
 
-    private static void doSomeFlatMapping() {
-        Observable
-                .from(STRING_LIST)
-                .doOnNext(s -> System.out.println("From Source Stream: " + s))
-                .flatMap(s -> charsFromString(s))
-                .subscribe(s -> System.out.println("From final Stream: " + s));
-    }
-
     private static Observable<String> charsFromString(String s) {
+        RxMain.log("In charsFromString");
         List<String> chars = new ArrayList<>();
         for (int i = 0; i < s.length(); i++) {
             chars.add("" + s.charAt(i));
@@ -153,4 +178,16 @@ public class Ch3_OperatorsAndTransformations {
                 .subscribe(s -> System.out.println("Mapped: " + s));
 
     }
+
+    private static void sleep(int millis) {
+        try {
+            System.out.println(new Date() + ": Going to sleep");
+            Thread.sleep(millis);
+            System.out.println(new Date() + ": Done sleeping");
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+
+
 }
