@@ -6,7 +6,7 @@ import rx.Observable;
 public class ObservableCreation {
 
     public static void main(String[] args) {
-        doSingleElementSubscribe();
+        //doSingleElementSubscribe();
         doNeverSubscription();
     }
 
