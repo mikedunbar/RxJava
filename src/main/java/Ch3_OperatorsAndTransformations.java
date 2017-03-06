@@ -30,12 +30,82 @@ public class Ch3_OperatorsAndTransformations {
         //mergeThreeObservableStreams();
         //mergeWithDelayError();
         //zipThreeStreams();
-        zipTwoStreamsProducingEventsAtDifferentFrequency();
+        //zipTwoStreamsProducingEventsAtDifferentFrequency();
         // combineLatestShowingDrop();
         //showlatestFrom();
 
+        //scanWithoutInitialValue();
+        //scanWithInitialValue();
+        //reduceWithInitialValue();
+        //collect();
+
+        //showSingleEnforcingOneValue();
+        //showDistinctDroppingDuplicates();
+        //showKeyVersionOfDistinct();
+        showDistinctUntilChanged();
 
 
+
+    }
+
+    private static void showDistinctUntilChanged() {
+        Observable.just(1,1,7,7,7,2,2,2,2,9)
+                .distinctUntilChanged()
+                .subscribe(System.out::println);
+    }
+
+    private static void showKeyVersionOfDistinct() {
+        Observable.just(new Tweet("Trump sucks", 7), new Tweet("Obama lied", 3), new Tweet("Jimmy crack corn", 7))
+                .distinct(tweet -> tweet.userId)
+                .subscribe(tweet -> {System.out.println(tweet.text);});
+    }
+
+    static class Tweet {
+        String text;
+        Integer userId;
+
+        public Tweet(String text, Integer userId) {
+            this.text = text;
+            this.userId = userId;
+        }
+    }
+
+    private static void showDistinctDroppingDuplicates() {
+        Observable.just(1, 2, 3, 1, 4, 2, 5, 1, 6)
+                .distinct()
+                .subscribe(System.out::println);
+    }
+
+    private static void showSingleEnforcingOneValue() {
+        Observable.range(1,2)
+                .single()
+                .subscribe((Integer n) -> {System.out.println("Got next: " + n);},
+                        (Throwable t) -> {System.out.println("Got error: " + t);},
+                        () -> {});
+    }
+
+    private static void collect() {
+        Observable.range(10, 20)
+                .collect(ArrayList::new, List::add)
+                .subscribe(System.out::println);
+    }
+
+    private static void reduceWithInitialValue() {
+        Observable.range(150, 200)
+                .reduce(500, (total, cur) -> total + cur)
+                .subscribe(System.out::println);
+    }
+
+    private static void scanWithInitialValue() {
+        Observable.range(1,100)
+                .scan(100, (total, cur) -> total + cur)
+                .subscribe(System.out::println);
+    }
+
+    private static void scanWithoutInitialValue() {
+        Observable<Integer> progress = Observable.range(1, 100)
+                .scan((total, cur) -> total + cur);
+        progress.subscribe(System.out::println);
     }
 
     private static void showlatestFrom() {
@@ -83,12 +153,7 @@ public class Ch3_OperatorsAndTransformations {
                 .forEach(System.out::println);
 
         sleep(1000);
-
-
-
     }
-
-
 
     private static void mergeThreeObservableStreams() {
         Observable<String> obs1 = Observable.just("hi", "bye");
