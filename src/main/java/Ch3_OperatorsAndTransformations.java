@@ -1,6 +1,8 @@
 import rx.Observable;
 import rx.Subscriber;
 
+import javax.annotation.CheckForNull;
+import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -42,11 +44,122 @@ public class Ch3_OperatorsAndTransformations {
         //showSingleEnforcingOneValue();
         //showDistinctDroppingDuplicates();
         //showKeyVersionOfDistinct();
-        showDistinctUntilChanged();
+        //showDistinctUntilChanged();
 
-
-
+        //showTake3();
+        //showSkip3();
+        //showTakeLast3();
+        //showSkipLast3();
+        //showFirst();
+        //showLast();
+        //showTakeFirstWithPred();
+        //showTakeUntil();
+        //showTakeWhile();
+        //showElementAt();
+        //showAllWithPredicate();
+        //showExists();
+        //showContains();
+        showTakeFirstWithSingle();
     }
+
+    private static void showTakeFirstWithSingle() {
+                Observable.range(1, 5)
+                        .takeFirst(x -> x > 5)
+                        //.single()
+                        .subscribe(System.out::println);
+    }
+
+    private static void showContains() {
+        Observable.range(1,5)
+                .contains(5)
+                .subscribe(System.out::println);
+
+        Observable.range(1,5)
+                .contains(6)
+                .subscribe(System.out::println);
+    }
+
+    private static void showExists() {
+        Observable.range(1,5)
+                .exists(x -> x % 2 == 0)
+                .subscribe(System.out::println);
+    }
+
+    private static void showAllWithPredicate() {
+        Observable.range(1,5)
+                .all(x -> x % 2 == 0)
+                .subscribe(System.out::println);
+
+        Observable.just(2,4,6,8)
+                .all(x -> x % 2 == 0)
+                .subscribe(System.out::println);
+    }
+
+    private static void showElementAt() {
+        Observable.range(1,5)
+                .elementAt(1)
+                .subscribe(System.out::println);
+    }
+
+    private static void showTakeWhile() {
+        Observable.range(1,5)
+                .takeWhile(x -> x < 4)
+                .subscribe(System.out::println);
+    }
+
+    private static void showTakeUntil() {
+        Observable.range(1,5)
+                .takeUntil(x -> x >= 4)
+                .subscribe(System.out::println);
+    }
+
+    private static void showTakeFirstWithPred() {
+        Observable.range(1,5)
+                .takeFirst(x -> x %2 == 0)
+                .subscribe(System.out::println);
+    }
+
+    private static void showLast() {
+        Observable.range(1,5)
+                .last()
+                .subscribe(System.out::println);
+    }
+
+    private static void showFirst() {
+        Observable.range(1,5)
+                .first()
+                .subscribe(System.out::println);
+    }
+
+    private static void showSkipLast3() {
+        Observable.range(1,5)
+                .skipLast(3)
+                .subscribe(System.out::println);
+    }
+
+    private static void showTakeLast3() {
+        Observable.range(1,5)
+                .takeLast(3)
+                .subscribe(System.out::println);
+    }
+
+    private static void showSkip3() {
+        Observable.range(1,5)
+                .take(6)
+                .subscribe(System.out::println);
+    }
+
+    private static void showTake3() {
+        Observable.range(1,5)
+                .take(3)
+                .subscribe(System.out::println);
+    }
+
+    @CheckForNull
+    public String getIt(@Nullable String init) {
+        return null;
+    }
+
 
     private static void showDistinctUntilChanged() {
         Observable.just(1,1,7,7,7,2,2,2,2,9)

@@ -30,6 +30,8 @@ dependencies {
 
     compile 'io.reactivex:rxjava:1.1.6'
     compile 'com.google.guava:guava:19.0'
+    compile 'com.google.code.findbugs:annotations:3.0.0'
+
 
 
     // Use the awesome Spock testing and specification framework even with Java
