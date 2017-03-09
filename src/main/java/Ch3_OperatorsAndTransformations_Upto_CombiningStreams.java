@@ -13,7 +13,7 @@ import static rx.Observable.interval;
 /**
  * @author Mike Dunbar
  */
-public class Ch3_OperatorsAndTransformations {
+public class Ch3_OperatorsAndTransformations_Upto_CombiningStreams {
 
     public static final List<String> STRING_LIST = Arrays.asList("hello", "goodbye", "tuna", "ham", "jelly", "trump", "funk");
 

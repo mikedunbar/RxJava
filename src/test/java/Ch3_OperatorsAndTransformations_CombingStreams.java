@@ -12,7 +12,7 @@ import static org.junit.Assert.assertNotEquals;
 /**
  * @author Mike Dunbar
  */
-public class Ch3_CombingStreams {
+public class Ch3_OperatorsAndTransformations_CombingStreams {
 
     @Test
     public void testConcatShallEmitAllItemsOfFirstStreamFollowedByAllItemsOfSecondStream() {

@@ -8,3 +8,5 @@ There is no attempt made a clean or reusable code - just bang out examples as qu
 Current pattern is a simple main method per class that calls various static methods, each of which illustrates a different concept.
 They should all be commented-out, and you just uncomment the one you wanna run - to keep output focused and minimal. 
 
+**Update: Switching to TDD beginning with Ch3_OperatorsAndTransformations_CombingStreams, will migrate the older examples as I can**
+
