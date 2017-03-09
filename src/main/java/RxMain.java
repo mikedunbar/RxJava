@@ -8,6 +8,7 @@ import rx.schedulers.Schedulers;
 
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -159,5 +160,15 @@ public class RxMain {
             e.printStackTrace();
         }
         log("Async transform done");
+    }
+
+    public static void sleep(int millis) {
+        try {
+            //System.out.println(new Date() + ": Going to sleep");
+            Thread.sleep(millis);
+            //System.out.println(new Date() + ": Done sleeping");
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 }

@@ -1,5 +1,4 @@
 import rx.Observable;
-import rx.Subscriber;
 
 import javax.annotation.CheckForNull;
 import javax.annotation.Nullable;
@@ -25,7 +24,7 @@ public class Ch3_OperatorsAndTransformations {
         //doSomeFlatMapReactingToCompletionAndErrorAsWell();
         //doDelayOperator();
         //doTimerWithFlatMap();
-        //doDelayOperatorVariedByInput();
+        doDelayOperatorVariedByInput();
         //rewriteDelayWithFlatMapAndTimer();
         //showConcatMatPreservingOrderOfSourceStreamEvents();
         //showHowToLimitConcurrencyWithFlatMap();
@@ -33,12 +32,12 @@ public class Ch3_OperatorsAndTransformations {
         //mergeWithDelayError();
         //zipThreeStreams();
         //zipTwoStreamsProducingEventsAtDifferentFrequency();
-        // combineLatestShowingDrop();
+        //combineLatestShowingDrop();
         //showlatestFrom();
 
         //scanWithoutInitialValue();
         //scanWithInitialValue();
-        //reduceWithInitialValue();
+        reduceWithInitialValue();
         //collect();
 
         //showSingleEnforcingOneValue();
@@ -230,7 +229,7 @@ public class Ch3_OperatorsAndTransformations {
                 .map(x -> "S" + x);
         slow.withLatestFrom(fast, (f,s) -> f + ":" + s)
                 .forEach(System.out::println);
-        sleep(5000);
+        RxMain.sleep(5000);
     }
 
     private static void combineLatestShowingDrop() {
@@ -240,7 +239,7 @@ public class Ch3_OperatorsAndTransformations {
                 (s, f) -> f + ":" + s
         ).forEach(System.out::println);
 
-        sleep(5000);
+        RxMain.sleep(5000);
     }
 
     private static void zipThreeStreams() {
@@ -265,7 +264,7 @@ public class Ch3_OperatorsAndTransformations {
                 (s1, s2) -> Arrays.asList(s1, s2))
                 .forEach(System.out::println);
 
-        sleep(1000);
+        RxMain.sleep(1000);
     }
 
     private static void mergeThreeObservableStreams() {
@@ -322,7 +321,7 @@ public class Ch3_OperatorsAndTransformations {
                         .take(2)
                         .map(i -> s.charAt(i.intValue())), 2      )
                 .subscribe(s -> System.out.println(new Date() + ": From final Stream: " + s));
-        sleep(10000);
+        RxMain.sleep(10000);
 
     }
 
@@ -332,7 +331,7 @@ public class Ch3_OperatorsAndTransformations {
                 .concatMap(x ->
                         Observable.timer(x.length(), TimeUnit.SECONDS).map(n -> x))
                 .subscribe(s -> System.out.println(new Date() + ": " + s));
-        sleep(30000);
+        RxMain.sleep(30000);
     }
 
     private static void rewriteDelayWithFlatMapAndTimer() {
@@ -341,7 +340,7 @@ public class Ch3_OperatorsAndTransformations {
                 .flatMap(x ->
                     Observable.timer(x.length(), TimeUnit.SECONDS).map(n -> x))
                 .subscribe(s -> System.out.println(new Date() + ": " + s));
-        sleep(10000);
+        RxMain.sleep(10000);
     }
 
     private static void doDelayOperatorVariedByInput() {
@@ -349,7 +348,7 @@ public class Ch3_OperatorsAndTransformations {
                 .from(STRING_LIST)
                 .delay(s -> Observable.just(s).timer(s.length(), TimeUnit.SECONDS))
                 .subscribe(s -> System.out.println(new Date() + ": " + s));
-        sleep(10000);
+        RxMain.sleep(10000);
     }
 
     private static void doTimerWithFlatMap() {
@@ -357,7 +356,7 @@ public class Ch3_OperatorsAndTransformations {
                 .timer(1, TimeUnit.SECONDS)
                 .flatMap(i -> Observable.just("a", "b", "c", "d"))
                 .subscribe(i -> System.out.println(new Date() + ": " + i));
-        sleep(2000);
+        RxMain.sleep(2000);
     }
 
     private static void doDelayOperator() {
@@ -365,7 +364,7 @@ public class Ch3_OperatorsAndTransformations {
                 .just("a", "b", "c", "d")
                 .delay(1, TimeUnit.SECONDS)
                 .subscribe(s -> System.out.println(new Date() + ": " + s));
-        sleep(2000);
+        RxMain.sleep(2000);
     }
 
     private static void doSomeFlatMapReactingToCompletionAndErrorAsWell() {
@@ -416,16 +415,6 @@ public class Ch3_OperatorsAndTransformations {
                 .map(s -> s.toUpperCase())
                 .subscribe(s -> System.out.println("Mapped: " + s));
 
-    }
-
-    private static void sleep(int millis) {
-        try {
-            System.out.println(new Date() + ": Going to sleep");
-            Thread.sleep(millis);
-            System.out.println(new Date() + ": Done sleeping");
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
     }
 
 
