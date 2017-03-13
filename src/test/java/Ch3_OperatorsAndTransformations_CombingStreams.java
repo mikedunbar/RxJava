@@ -1,12 +1,14 @@
 import org.junit.Test;
 import rx.Observable;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
+import static rx.Observable.interval;
+import static rx.Observable.just;
+import static rx.Observable.zip;
 
 
 /**
@@ -16,8 +18,8 @@ public class Ch3_OperatorsAndTransformations_CombingStreams {
 
     @Test
     public void testConcatShallEmitAllItemsOfFirstStreamFollowedByAllItemsOfSecondStream() {
-        Observable<String> stooges = Observable.just("moe", "larry", "curly");
-        Observable<String> hucksters = Observable.just("Trump", "Spicer", "Bannon");
+        Observable<String> stooges = just("moe", "larry", "curly");
+        Observable<String> hucksters = just("Trump", "Spicer", "Bannon");
 
         List<String> all = new ArrayList<>();
         stooges
@@ -28,8 +30,8 @@ public class Ch3_OperatorsAndTransformations_CombingStreams {
     }
 
     @Test
-    public void testConcatShallCombineTheSameStreamWithDifferentOperators() {
-        Observable<String> colors = Observable.just("Trump", "Spicer", "Bannon");
+    public void testConcatCanCombineASingleSourceStreamMultiipleTimesWithDifferentOperators() {
+        Observable<String> colors = just("Trump", "Spicer", "Bannon");
         Observable<String> someColors = Observable.concat(
                 colors.take(1),
                 colors.takeLast(1)
@@ -47,7 +49,7 @@ public class Ch3_OperatorsAndTransformations_CombingStreams {
             subscriber.onCompleted();
         });
 
-        Observable<String> stream2 = Observable.just("Trump", "Spicer", "Bannon");
+        Observable<String> stream2 = just("Trump", "Spicer", "Bannon");
 
         List<String> vals = new ArrayList<>();
         Observable.concat(
@@ -59,7 +61,7 @@ public class Ch3_OperatorsAndTransformations_CombingStreams {
     }
 
     @Test
-    public void testMergeShallInterleaveElementsFromTheStreamsUnlikeConcat() {
+    public void testMergeShallInterleaveElementsFromCombinedStreamsUnlikeConcat() {
         List<String> stoogeList = Arrays.asList("moe", "larry", "curly");
         List<String> hucksterList = Arrays.asList("Trump", "Spicer", "Bannon");
         List<String> orderedList = Arrays.asList("moe", "larry", "curly", "Trump", "Spicer", "Bannon");
@@ -99,4 +101,42 @@ public class Ch3_OperatorsAndTransformations_CombingStreams {
         RxMain.sleep(200);
         assertEquals(orderedList, concatedList);
     }
+
+    @Test
+    public void testSwitchOnNextShallUnsubscribeFromEachInnerStreamWhenTheNextInnerStreamAppears() {
+        Observable<String> stoogeList = zip(
+                just("moe", "larry", "curly"),
+                interval(500, TimeUnit.MILLISECONDS),
+                (item, delay) -> item);
+        Observable<String> hucksterList = zip(
+                just("Trump", "Spicer", "Bannon"),
+                interval(500, TimeUnit.MILLISECONDS),
+                (item, delay) -> item);
+        Observable<String> heroList = zip(
+                just("batman", "wonder woman", "super man", "gi jane"),
+                interval(500, TimeUnit.MILLISECONDS),
+                (item, delay) -> item);
+
+        Random rnd = new Random();
+
+        Observable<Observable<String>> people = just(
+                stoogeList.map(e -> "Stooge: " + e),
+                hucksterList.map(e -> "Huckster: " + e),
+                heroList.map(e -> "Hero: " + e))
+            .flatMap((Observable<String> g) -> {
+                Observable<Observable<String>> inner = just(g).delay(rnd.nextInt(5), TimeUnit.SECONDS);
+                return inner;
+            });
+
+        // TODO: De-randomize this and test for expected behavior. For now, just look at output
+
+        Observable
+                .switchOnNext(people)
+                .subscribe(e -> RxMain.log(e + " at " + System.currentTimeMillis()));
+
+        RxMain.sleep(10000);
+
+
+    }
+
 }
