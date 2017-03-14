@@ -129,7 +129,6 @@ public class Ch3_OperatorsAndTransformations_CombingStreams {
             });
 
         // TODO: De-randomize this and test for expected behavior. For now, just look at output
-
         Observable
                 .switchOnNext(people)
                 .subscribe(e -> RxMain.log(e + " at " + System.currentTimeMillis()));
