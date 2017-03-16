@@ -17,12 +17,11 @@ public class Ch4_EmbracingLazinessWithDefer {
         Observable<Integer> deferedObservable = Observable.defer(() -> {
             tracker.hasBeenCalled = true;
             return Observable.just(1, 2, 3, 4, 5, 6);});
+        deferedObservable.first();
         assertFalse(tracker.hasBeenCalled);
-        deferedObservable.first().subscribe(e -> {});
+        deferedObservable.subscribe(e -> {});
         assertTrue(tracker.hasBeenCalled);
     }
-
-
 
     static class Tracker {
         boolean hasBeenCalled;
