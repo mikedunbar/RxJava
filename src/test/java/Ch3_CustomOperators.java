@@ -58,6 +58,18 @@ public class Ch3_CustomOperators {
         });
     }
 
+    @Test
+    public void testToStringOfOddDropSubShallNeverComplete() {
+        //TODO hook into the upstream operator, to see that it never completes
+        range(1, 10)
+            .lift(toStringOfOddDropChildSub())
+            .take(2)
+            .toList().subscribe(l -> {
+            List<String> expected = Arrays.asList("1", "3");
+            assertEquals(expected, l);
+        });
+    }
+
 
     <T> Observable.Operator<String, T> toStringOfOdd() {
         return new Observable.Operator<String, T>() {
@@ -65,6 +77,36 @@ public class Ch3_CustomOperators {
 
             public Subscriber<? super T> call(Subscriber<? super String> child) {
                 return new Subscriber<T>(child) {
+                    @Override
+                    public void onCompleted() {
+                        child.onCompleted();
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        child.onError(e);
+                    }
+
+                    @Override
+                    public void onNext(T t) {
+                        if (odd) {
+                            child.onNext(t.toString());
+                        } else {
+                            request(1);
+                        }
+                        odd = !odd;
+                    }
+                };
+            }
+        };
+    }
+
+    <T> Observable.Operator<String, T> toStringOfOddDropChildSub() {
+        return new Observable.Operator<String, T>() {
+            private boolean odd = true;
+
+            public Subscriber<? super T> call(Subscriber<? super String> child) {
+                return new Subscriber<T>() {
                     @Override
                     public void onCompleted() {
                         child.onCompleted();
